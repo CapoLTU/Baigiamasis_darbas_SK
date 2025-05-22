@@ -60,11 +60,3 @@ def timed_trigger(interval_seconds, action, repeat=True):
     except KeyboardInterrupt:
         print("Sustabdyta rankiniu būdu.")
 
-#______________________Naudojimas________________________________________________________________
-# def mano_veiksmas():
-#     print("➡️ Čia tavo funkcija: pvz. sekos generavimas arba modelio prognozė.")
-
-# # Paleidžiam trigerį, kuris veiks kas 10 sekundžių:
-# timed_trigger(interval_seconds=10, action=mano_veiksmas)
-    #_________________Jei norim tik vieno suveikimo_____________________
-    # timed_trigger(interval_seconds=5, action=mano_veiksmas, repeat=False)
