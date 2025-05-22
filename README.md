@@ -5,7 +5,7 @@
 
 ---
 
-## 📁 Projekto struktūra
+## Projekto struktūra
 
 ###  1. Duomenų analizė ir apdorojimas
 | Failas                      | Funkcija |
@@ -58,7 +58,7 @@
 
 ---
 
-## 🔂 Loginės priklausomybės schema
+## Loginės priklausomybės schema
 
 ```
 read_data.py
@@ -146,11 +146,23 @@ tzdata==2025.2
 python main.py
 ```
 
-Pasirinkus `main.py`, vartotojas gali pasirinkti modelį (LSTM/GRU), treniruoti, testuoti arba naudoti OUT/SP skaičiavimą.
+main.py - suteikia galimybę vartotojui interaktyviai pasirinkti modelio tipą (LSTM arba GRU), atlikti treniravimą, testavimą, prognozių analizę, vizualizaciją bei kitus veiksmus, susijusius su modelių palyginimu ir rezultatų interpretacija.
 
 ---
+```bash
+python LV_out_sp_skaiciavimas.py
+python Optuna_tik_analize.py
+```
+Šie skriptai nesileidžia iš main.py ir turi būti vykdomi atskirai:
 
-## 🔖 Licencija
 
-Projektas mokslinis, sukurtas baigiamajam darbui. Naudoti galima edukaciniais tikslais.
+LV_out_sp_skaiciavimas.py - OUT valdymo užduoties (SP) skaičiavimas pagal LSTM prognozę, leidžiant pasirinkti tarp automatinio režimo (su trigeriu) arba vienkartinio vykdymo.
+
+
+Optuna_tik_analize.py – atlieka automatinį LSTM modelio hiperparametrų optimizavimą naudojant Optuna biblioteką; apima modelio struktūros paiešką, nuostolių stebėjimą ir geriausių parametrų išvedimą. Vykdomas savarankiškai, nepriklausomai nuo main.py.
+
+
+##  Licencija
+
+Projektas sukurtas baigiamajam darbui. Naudoti galima edukaciniais tikslais.
 
