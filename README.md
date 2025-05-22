@@ -7,51 +7,51 @@
 
 ## 📁 Projekto struktūra
 
-### 🔍 1. Duomenų analizė ir apdorojimas
+###  1. Duomenų analizė ir apdorojimas
 | Failas                      | Funkcija |
 |----------------------------|----------|
 | `read_data.py`             | Sujungia .txt failus į vieną `DataFrame`. |
 | `duomenu_analizes.py`      | Koreliacija, PACF analizė, kintamųjų atranka. |
-| `normalizavimo_poreikis.py`| Histogramų analizė, pagrindžianti normalizavimą. |
+| `normalizavimo_poreikis.py`| Histogramų analizė, pagrindžianti normalizavimą. |  
 
-### 🧪 2. Duomenų paruošimas mokymui
+###  2. Duomenų paruošimas mokymui
 | Failas                          | Funkcija |
 |--------------------------------|----------|
-| `duomenu_paruosimas.py`        | Sukuria sekas, padalina į train/val/test. |
-| `optuna_duomenu_paruosimas.py` | Naudojamas hiperparametrų optimizacijai. |
+| `duomenu_paruosimas.py`        | transformuoja laiko eilučių duomenis į modelio mokymui tinkamą formatą, sukuriant normalizuotas slenkančių langų sekas ir padalijant jas į mokymo, validacijos ir testavimo rinkinius. |
+| `optuna_duomenu_paruosimas.py` | Paruošia duomenis modelio hiperparametrų optimizacijai su Optuna |
 | `generatorius_2.py`            | Sekų generavimas pavieniam prognozavimui. |
 
-### 🤖 3. Modelių architektūra
+###  3. Modelių architektūra
 | Failas                  | Aprašymas |
 |------------------------|-----------|
 | `LSTM_modelio_arch.py` | Trijų sluoksnių LSTM su treniravimo, testavimo funkcijomis. |
-| `GRU_modelio_arch.py`  | GRU versija – palyginimui. |
+| `GRU_modelio_arch.py`  | GRU versija – palyginimui.                                  |
 
-### 🏋️‍♂️ 4. Modelio apmokymas
+###  4. Modelio apmokymas
 | Failas                     | Funkcija |
 |---------------------------|----------|
-| `LSTM_modelio_mokymas.py` | LSTM treniravimas su vizualizacija. |
-| `GRU_modelio_mokyma.py`   | GRU treniravimas. |
+| `LSTM_modelio_mokymas.py` | LSTM treniravimas su vizualizacija.   |
+| `GRU_modelio_mokyma.py`   | GRU treniravimas.                     |
 | `Optuna_tik_analize.py`   | Optuna optimizacija hiperparametrams. |
 
-### 🧪 5. Testavimas ir analizė
+###  5. Testavimas ir analizė
 | Failas                     | Funkcija |
 |---------------------------|----------|
-| `LSTM_testavimas.py`      | LSTM testavimas, metrikos, vaizdavimas. |
-| `GRU_testavimas.py`       | GRU testavimas. |
-| `modelio_testavimo_analize.py` | Metrikų analizė: MAE, RMSE, R², klaidos histogramos. |
+| `LSTM_testavimas.py`      | LSTM testavimas, metrikos, vaizdavimas.                           |
+| `GRU_testavimas.py`       | GRU testavimas, metrikų skaičiavimas ir rezultatų vizualizavimas. |
+| `modelio_testavimo_analize.py` | Metrikų analizė: MAE, RMSE, R², klaidos histogramos.         |
 
-### 🎯 6. OUT/Setpoint skaičiavimas
+###  6. OUT/Setpoint skaičiavimas
 | Failas                        | Funkcija |
 |------------------------------|----------|
-| `LV_out_sp_skaiciavimas.py`  | OUT valdymo užduoties (SP) skaičiavimas pagal LSTM prognozę. |
+| `LV_out_sp_skaiciavimas.py`  | OUT valdymo užduoties (SP) skaičiavimas pagal LSTM prognozę, leidžiant pasirinkti tarp automatinio režimo (su trigeriu) arba vienkartinio vykdymo. |
 
-### 🔁 7. Laiko paleidiklis
+###  7. Paleidimui pagal laiką
 | Failas                     | Funkcija |
 |---------------------------|----------|
 | `trigeris_pagal_laika.py` | Paleidžia modelio prognozę periodiškai kas N sekundžių (`threading.Timer`). |
 
-### 🚀 8. Paleidimo failas
+###  8. Paleidimo failas
 | Failas      | Funkcija |
 |-------------|----------|
 | `main.py`   | Centralizuotas pasirinkimas ką vykdyti: treniruoti, testuoti, reguliuoti, naudoti GRU ar LSTM. |
@@ -103,7 +103,7 @@ seaborn
 
 ---
 
-## ✅ Paleidimas
+##  Paleidimas
 
 ```bash
 python main.py
