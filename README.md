@@ -58,6 +58,15 @@
 
 ---
 
+##  Duomenų rinkiniai 
+
+
+| Direktorija | Funkcija |
+|-------------|----------|
+| `main.py`   | duomenų rinkinys modelių mokymui, validacijai ir testavimui |
+
+---
+
 ## Loginės priklausomybės schema
 
 ```
