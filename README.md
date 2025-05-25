@@ -59,11 +59,11 @@
 ---
 
 ##  Duomenų rinkiniai 
-
-
 | Direktorija | Funkcija |
 |-------------|----------|
-| `main.py`   | duomenų rinkinys modelių mokymui, validacijai ir testavimui |
+| `1minminute_txt` | duomenų rinkinys modelių mokymui, validacijai ir testavimui |
+| `1min_txt_optuna` | duomenų rinkinys Optuna hyperparametrų optimizacijai|
+| `1min_txt_gen_test`| duomenų rinkinys laiko eilučių, naudojamų `LV_out_sp_skaiciavimas.py`, generavimui |
 
 ---
 
