@@ -5,26 +5,31 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
 def analyze_predictions(preds, targets, rolling_window = 10):
     """
-    Atliekama detali analizė tarp prognozuotų ir tikrų reikšmių.
+      Atliekama prognoziu analize:
+    - Skaičiuoja metrikas (MSE, MAE, RMSE, R², MAPE, SMAPE)
+    - Braižo klaidų histogramą
+    - Braižo scatter grafiką (tikros vs prognozuotos)
+    - Braižo slenkančią (rolling) vidutinę klaidą
     """
-    # Užtikrinam, kad būtų numpy array
+    
+    # Užtikrinam, kad būtų vienmaciai numpy masyvai
     preds = np.array(preds).flatten()
     targets = np.array(targets).flatten()
 
-    # Metrikos
-    mse = mean_squared_error(targets, preds)
-    mae = mean_absolute_error(targets, preds)
-    rmse = np.sqrt(mse)
-    r2 = r2_score(targets, preds)
+    # Metriku skaiciavimas
+    mse = mean_squared_error(targets, preds)                                        # Vidutine kvadratine klaida
+    mae = mean_absolute_error(targets, preds)                                       # Vidutine absoliuti klaida
+    rmse = np.sqrt(mse)                                                             # Saknis iš MSE
+    r2 = r2_score(targets, preds)                                                   # Determinacijos koeficientas
 
     # MAPE ir SMAPE 
-    epsilon = 1e-8
-    mape = np.mean(np.abs((targets - preds) / (targets + epsilon))) * 100
-    smape = 100 / len(targets) * np.sum(
+    epsilon = 1e-8                                                                  # Apsauga nuo dalybos iš nulio
+    mape = np.mean(np.abs((targets - preds) / (targets + epsilon))) * 100           # MAPE – vidutine procentine klaida
+    smape = 100 / len(targets) * np.sum(                                            # SMAPE – simetrinė MAPE versija
         2 * np.abs(preds - targets) / (np.abs(targets) + np.abs(preds) + epsilon)
     )
 
-    # Spausdinam metrikas
+    # Metriku atvaizdavimas
     print("===== METRIKOS =====")
     print(f"MSE :  {mse:.6f}")
     print(f"MAE :  {mae:.6f}")
@@ -33,10 +38,10 @@ def analyze_predictions(preds, targets, rolling_window = 10):
     print(f"MAPE :  {mape:.2f}%")
     print(f"SMAPE:  {smape:.2f}%")
 
-    # Klaidos
-    errors = preds - targets
+    # Klaidu analize
+    errors = preds - targets                                                        # Skirtumas tarp prognozes ir tikros reiksmes
 
-    # Klaidų histogramą
+    # Histogramos braizymas – klaidų pasiskirstymas
     plt.figure(figsize=(8, 4))
     plt.hist(errors, bins=50, edgecolor='k')
     plt.title("Prognozių klaidų pasiskirstymas")
@@ -60,7 +65,7 @@ def analyze_predictions(preds, targets, rolling_window = 10):
     plt.tight_layout()
     plt.show()
 
-    # Rolling klaida
+    # # Apskaiciuojame slenkancia (rolling MAE) vidutine absoliutine klaida
     rolling_error = pd.Series(np.abs(errors)).rolling(window=rolling_window).mean()
     plt.figure(figsize=(10, 4))
     plt.plot(rolling_error)

@@ -20,7 +20,6 @@ def LSTM_train(duom_dir, tikslas):
     
    
     train_losses, val_losses = LSTM_modelio_arch.train_model(model, train_loader, val_loader, optimizer, criterion, device, epochs=50)
-    #train_losses, val_losses = LSTM_modelio_arch.train_model()
     plt.figure(figsize=(8, 5))
     plt.plot(train_losses, label='Mokymo nuostolis')
     plt.plot(val_losses, label='Validacijos nuostolis')

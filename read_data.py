@@ -2,42 +2,38 @@ import pandas as pd
 import glob
 import os
 
-direktorija = 'D:/projektas/test_1min_txt'
-prognozes_reiksme = 'AB50A30LRC01_PV'
-def read_data(direktorija): #perduodam direktorija kuriame yra txt failai
+direktorija = 'D:/projektas/test_1min_txt'                      #nurodo katalogą, kuriame yra .txt failai.
+prognozes_reiksme = 'AB50A30LRC01_PV'                           #Prognozuomu reiksmiu stulpelis (Y)
+def read_data(direktorija):                                     #perduodam direktorija kuriame yra txt failai
 
-# Randame visus .txt failus kataloge ir pasidarom failu lista iteracijoms
-    txt_failai = glob.glob(os.path.join(direktorija, "*.txt"))
+    txt_failai = glob.glob(os.path.join(direktorija, "*.txt")) # Randame visus .txt failus kataloge ir pasidarom failu lista iteracijoms
     df_listas = []
 
-# Nuskaitymas į pandas DataFrame ir sujungimas į vieną
-    for failas in txt_failai:
+    for failas in txt_failai:                                   # Nuskaitymas į pandas DataFrame ir sujungimas į vieną
         try:
             df = pd.read_csv(failas, sep=',', low_memory=False, dtype=str)
-            df.columns = df.columns.str.strip()
+            df.columns = df.columns.str.strip()                 #pasalinam visus tarpus nuo stulpeliu pavadinimu
 
-            if 'Date stamp' in df.columns:
+            if 'Date stamp' in df.columns:                      #Jei yra stulpelis „Date stamp“, jį konvertuoja į datetime formatą
                 df['Date stamp'] = pd.to_datetime(df['Date stamp'], errors='coerce', format='%Y-%m-%d %H:%M:%S')
-            else:
+            else:                                               #Jei nėra „Date stamp“ stulpelio, isveda ispejima.
                 print(f"Įspėjimas: Faile {failas} nėra 'Date stamp' stulpelio!")
 
-            df_listas.append(df)
+            df_listas.append(df)                                #Įtraukia sąrašą ir isveda pranesima apie sekminga nuskaityma
             print(f"Failas {failas} sėkmingai nuskaitytas ir suformatuotas!")
-        except Exception as e:
+        except Exception as e:                                  #Jei aptinkama klaida, isvedamas pranesimas
             print(f"Klaida skaitant failą {failas}: {e}")
 
-# Sujungiame visus duomenis į vieną DataFrame
-    if df_listas:
+    if df_listas:                                               # Sujungiame visus duomenis į vieną DataFrame
         df_apjungtas = pd.concat(df_listas, ignore_index=True)
 
-    # Automatinė stulpelių konversija į skaitines reikšmes po sujungimo
-        for stulp in df_apjungtas.columns:
-            if stulp != 'Date stamp':  # Neperkonvertuojame datos stulpelio
+        for stulp in df_apjungtas.columns:                      # Automatinė stulpelių konversija į skaitines reikšmes po sujungimo
+            if stulp != 'Date stamp':                           # Neperkonvertuojame datos stulpelio.  Netinkamos reikšmės tampa NaN
                 df_apjungtas[stulp] = pd.to_numeric(df_apjungtas[stulp], errors='coerce')
-        df_apjungtas.set_index('Date stamp', inplace=True)
-        return df_apjungtas
+        df_apjungtas.set_index('Date stamp', inplace=True)        # Nustatome  „Date stamp“ kaip indeksa 
         print("Visi failai sėkmingai sujungti į vieną DF su suvienodintu 'Date stamp' formatu!")
         print("Visi skaitiniai stulpeliai konvertuoti iš 'str' į tinkamus tipus.")
-    else:
+        return df_apjungtas
+    else:                                                       # Jei sarasas tuščias, isvedame pranešamapranesima ir grąžinamagraziname None.
         print("Nerasta tinkamų failų sujungimui.")
         return None

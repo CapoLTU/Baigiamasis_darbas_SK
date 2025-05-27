@@ -9,17 +9,15 @@ from tqdm import tqdm
 from optuna_duomenu_paruosimas import train_val_test_opt
 from duomenu_paruosimas import train_val_test
 
-# pasirenkam gpu cpu
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-print(f"Naudojamas įrenginys: {device}")
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")                           # Nusistatome ar galime naudoti GPU, ar CPU
+print(f"Naudojamas įrenginys: {device}")                                                        # Isvedame irenginio, su kuriuo dirbsime pavadinima
 
-# parametrai analizei
-duomenu_direktorija = 'D:/projektas/1min_txt_optuna'
-prognozes_reiksme = 'AB50A30LRC01_PV'
-sequence_length = 35
+duomenu_direktorija = 'D:/projektas/1min_txt_optuna'                                            # Nustatome kataloga ir 
+prognozes_reiksme = 'AB50A30LRC01_PV'                                                           # Nustatome prognozuojamu verciu (Target) stulpeli
+sequence_length = 35                                                                            # Nustatome sekos ilgi
 
-# Duomenys - taas pats kaip ir treniravimui tik biski modifikuotas
-X_train, y_train, X_val, y_val = train_val_test_opt(duomenu_direktorija, prognozes_reiksme)
+# Paruošiame duomenis treniravimui ir validacijai ( test )
+X_train, y_train, X_val, y_val = train_val_test_opt(duomenu_direktorija, prognozes_reiksme)     # Iskvieciame funkcija "train_val_test_opt", duomenu nuskaitimui ir apjungimui
 train_data = TensorDataset(X_train, y_train)
 val_data = TensorDataset(X_val, y_val)
 
@@ -50,7 +48,7 @@ class LSTMModel(nn.Module):
         return output
 
 # Optuna tikslinė funkcija
-def objective(trial):
+def objective(trial):                                                                           # Hiperparametru parinkimas Optuna pagalba
     hidden1 = trial.suggest_int("hidden1", 32, 256, step=32)
     hidden2 = trial.suggest_int("hidden2", 16, 128, step=16)
     hidden3 = trial.suggest_int("hidden3", 8, 64, step=8)
@@ -58,7 +56,7 @@ def objective(trial):
     lr = trial.suggest_float("lr", 1e-5, 1e-2, log=True)
     batch_size = trial.suggest_categorical("batch_size", [8, 16, 32, 64])
 
-    model = LSTMModel(
+    model = LSTMModel(                                                                          # Sukuriame modeli su bandomais parametrais
         input_size=X_train.shape[2],
         hidden_sizes=[hidden1, hidden2, hidden3],
         dropout_rate=dropout
@@ -67,64 +65,63 @@ def objective(trial):
     optimizer = optim.AdamW(model.parameters(), lr=lr)
     criterion = nn.MSELoss()
 
-    train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
+    train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True)                  # Sukuriame DataLoader
     val_loader = DataLoader(val_data, batch_size=batch_size, shuffle=False)
 
-    num_epochs = 10
+    num_epochs = 10                                                                             # Nustatome kiek epochu treniruoti modeli
     model.train()
-    for epoch in range(num_epochs):
-        epoch_loss = 0.0
+    for epoch in range(num_epochs):                                                             # Pradedamas treniravimo epochu ciklas
+        epoch_loss = 0.0                                                                        # Parametras bendram epochos nuostolio kaupimui
         train_loader_tqdm = tqdm(train_loader, desc=f"Epocha {epoch+1}/{num_epochs}", leave=False)
-        for i, (xb, yb) in enumerate(train_loader_tqdm):
+        for i, (xb, yb) in enumerate(train_loader_tqdm):                                        # Iteruojame per visus mini-batch'us duomenyse
             xb, yb = xb.to(device), yb.to(device)
-            optimizer.zero_grad()
-            output = model(xb)
-            loss = criterion(output, yb)
-            loss.backward()
-            optimizer.step()
+            optimizer.zero_grad()                                                               # Nunulinam gradientus pries kiekviena žingsni
+            output = model(xb)                                                                  # Perduodame mini-batch'ą į modelį, gauname prognozes
+            loss = criterion(output, yb)                                                        # Apskaiciuojame nuostoli tarp prognoziu ir tikru reiksmiu
+            loss.backward()                                                                     # Atgalinis gradientu skaiciavimas
+            optimizer.step()                                                                    # Atnaujiname modelio svorius pagal gradientus
 
-            epoch_loss += loss.item()
-            percent_done = (i + 1) / len(train_loader)
+            epoch_loss += loss.item()                                                           # Pridedame batch'o nuostoli prie visos epochos nuostolio
+            percent_done = (i + 1) / len(train_loader)                                          # Atnaujiname progreso juostos informacija
             train_loader_tqdm.set_postfix({
                 "Progresas": f"{percent_done * 100:.1f}%",
                 "Loss": f"{loss.item():.4f}"
             })
 
-        avg_loss = epoch_loss / len(train_loader)
-        print(f"Epocha {epoch+1}/{num_epochs} baigta. Vidutinis nuostolis: {avg_loss:.4f}")
+        avg_loss = epoch_loss / len(train_loader)                                               # Apskaiciuojame vidutini epochos nuostoli
+        print(f"Epocha {epoch+1}/{num_epochs} baigta. Vidutinis nuostolis: {avg_loss:.4f}")     # Isvedame epochos rezultata
 
     # Validacija su progresu
     model.eval()
-    val_loss = 0.0
+    val_loss = 0.0                                                                              # Kintamasis bendram validacijos nuostoliui
     val_loader_tqdm = tqdm(val_loader, desc="🔍 Validacija", leave=False)
-    with torch.no_grad():
-        for xb, yb in val_loader_tqdm:
+    with torch.no_grad():                                                                       # Atliekame validacija be gradientu skaiciavimo
+        for xb, yb in val_loader_tqdm:                                                          # Iteruojame per visus validacijos duomenu mini-batch'us 
             xb, yb = xb.to(device), yb.to(device)
-            output = model(xb)
-            loss = criterion(output, yb)
+            output = model(xb)                                                                  # Atliekame prognoze
+            loss = criterion(output, yb)                                                        # Apskaiciuojame nuostoli
             val_loss += loss.item()
             val_loader_tqdm.set_postfix({
                 "Loss": f"{loss.item():.4f}"
             })
 
-    return val_loss / len(val_loader)
+    return val_loss / len(val_loader)                                                           # Baigus visus batch'us – apskaiciuojame vidutini validacijos nuostoli
 
 # Optimizavimas su Optuna
-n_trials = 15
+n_trials = 15                                                                                   # Nustatome kiek bandymų atlikti
 study = optuna.create_study(
-    study_name="lstm_pytorch_optimization",
-    direction="minimize",
-    storage="sqlite:///optuna.db",
+    study_name="lstm_pytorch_optimization",                                                     # Analizes duomenu rinkinio pavadinimas DB
+    direction="minimize",                                                                       # Tikslas – minimizuoti
+    storage="sqlite:///optuna.db",                                                              # Kur saugoti rezultatus
     load_if_exists=True
 )
 
-with tqdm(total=n_trials, desc="Optuna optimizacija") as pbar:
-    def progress_callback(study, trial):
+with tqdm(total=n_trials, desc="Optuna optimizacija") as pbar:                                  # Progreso juosta visai Optuna optimizacijos eigai
+    def progress_callback(study, trial):                                                        # Atnaujina progreso juostą po kiekvieno bandymo
         pbar.update(1)
     study.optimize(objective, n_trials=n_trials, callbacks=[progress_callback])
 
-# Geriausi hiperparametrai
-print(" Geriausi hiperparametrai:")
+print(" Geriausi hiperparametrai:")                                                             # Geriausiu rastu hiperparametru isvedimas
 for param, value in study.best_params.items():
     print(f"  {param}: {value}")
 print(f" Mažiausias validacijos nuostolis: {study.best_value:.6f}")
